@@ -1,0 +1,7 @@
+services:
+  manager:
+    build: /Manager
+    ports:
+      - 8080:8080
+  worker:
+    build: /Worker
