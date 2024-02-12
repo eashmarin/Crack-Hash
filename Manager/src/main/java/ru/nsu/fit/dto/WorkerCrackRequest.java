@@ -5,8 +5,8 @@ import java.util.UUID;
 public record WorkerCrackRequest(
         UUID requestId,
         String hash,
-        int maxLength,
-        int partNumber,
-        int partCount
+        Integer maxLength,
+        Integer partNumber,
+        Integer partCount
 ) {
 }

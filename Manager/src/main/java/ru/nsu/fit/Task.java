@@ -6,7 +6,7 @@ import java.util.Set;
 
 public class Task {
     private Status status = Status.IN_PROGRESS;
-    private final Set<String> data = new HashSet<>();
+    private final Set<String> data = Collections.synchronizedSet(new HashSet<>());
     private int completedWorkers = 0;
 
     private Task() {}

@@ -1,10 +1,13 @@
 package ru.nsu.fit;
 
+import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import ru.nsu.fit.dto.RequestStatus;
 import ru.nsu.fit.dto.WorkerCrackRequest;
 
-import java.util.*;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 @org.springframework.stereotype.Service
@@ -16,7 +19,7 @@ public class Service {
 
     public Service() {
         this.webClient = WebClient.builder()
-                .baseUrl("worker:8080/internal/api/worker/hash/crack/task")
+                .baseUrl("http://worker:8080/internal/api/worker/hash/crack/task")
                 .build();
     }
 
@@ -26,8 +29,10 @@ public class Service {
         tasks.put(requestId, Task.defaultTask());
 
         webClient.post()
-                .bodyValue(new WorkerCrackRequest(requestId, hash, maxLength, 1, 1))
-                .exchange();
+                .body(BodyInserters.fromValue(new WorkerCrackRequest(requestId, hash, maxLength, 1, 1)))
+                .retrieve()
+                .toBodilessEntity()
+                .block();
 
         return requestId;
     }

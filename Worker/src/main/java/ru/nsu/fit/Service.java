@@ -5,7 +5,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 import ru.nsu.fit.dto.WorkerResponse;
 
 import java.math.BigInteger;
-import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
@@ -32,7 +31,7 @@ public class Service {
         }
 
         this.webClient = WebClient.builder()
-                .baseUrl("manager:8080/internal/api/manager/hash/crack/request")
+                .baseUrl("http://manager:8080/internal/api/manager/hash/crack/request")
                 .build();
     }
 
@@ -60,13 +59,14 @@ public class Service {
 
                 if (wordHash.equals(hash)) {
                     wordsSet.add(sb.toString());
-                    System.out.printf(sb.toString());
                 }
             });
         }
 
         webClient.patch()
                 .bodyValue(new WorkerResponse(requestId, wordsSet))
-                .exchange();
+                .retrieve()
+                .toBodilessEntity()
+                .block();
     }
 }
