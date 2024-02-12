@@ -1,4 +1,4 @@
-package ru.nsu.fit;
+package ru.nsu.fit.domain;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -15,10 +15,10 @@ public class Task {
         return new Task();
     }
 
-    public Task workerCompleted(Set<String> foundWords) {
+    public Task workerCompleted(Set<String> foundWords, final int WORKERS_NUMBER) {
         data.addAll(foundWords);
         completedWorkers++;
-        if (completedWorkers == Service.WORKERS_NUMBER) {
+        if (completedWorkers == WORKERS_NUMBER) {
             status = Status.READY;
         }
         return this;

@@ -1,6 +1,6 @@
 package ru.nsu.fit.port;
 
-import ru.nsu.fit.Service;
+import ru.nsu.fit.domain.Manager;
 import ru.nsu.fit.dto.ManagerCrackRequest;
 import ru.nsu.fit.dto.RequestStatus;
 import org.springframework.web.bind.annotation.*;
@@ -8,22 +8,21 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/hash")
 public class Controller {
 
-    private final Service service;
+    private final Manager manager;
 
-    public Controller(Service service) {
-        this.service = service;
+    public Controller(Manager manager) {
+        this.manager = manager;
     }
 
-    @PostMapping("/crack")
+    @PostMapping(ManagerUrl.CRACK_REQUEST)
     public UUID crack(@RequestBody ManagerCrackRequest crackRequestBody) {
-        return service.splitTask(crackRequestBody.hash(), crackRequestBody.maxLength());
+        return manager.splitTask(crackRequestBody.hash(), crackRequestBody.maxLength());
     }
 
-    @GetMapping("/status")
+    @GetMapping(ManagerUrl.CRACK_STATUS)
     public RequestStatus checkStatus(@RequestParam("requestId") UUID requestId) {
-        return service.getTaskStatus(requestId);
+        return manager.getTaskStatus(requestId);
     }
 }
