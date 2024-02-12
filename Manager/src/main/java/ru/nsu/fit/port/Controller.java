@@ -1,9 +1,11 @@
 package ru.nsu.fit.port;
 
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.HttpClientErrorException;
 import ru.nsu.fit.domain.Manager;
 import ru.nsu.fit.dto.ManagerCrackRequest;
 import ru.nsu.fit.dto.RequestStatus;
-import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
@@ -22,7 +24,13 @@ public class Controller {
     }
 
     @GetMapping(ManagerUrl.CRACK_STATUS)
-    public RequestStatus checkStatus(@RequestParam("requestId") UUID requestId) {
-        return manager.getTaskStatus(requestId);
+    public ResponseEntity<RequestStatus> checkStatus(@RequestParam("requestId") UUID requestId) {
+        RequestStatus taskStatus;
+        try {
+            taskStatus = manager.getTaskStatus(requestId);
+        } catch (HttpClientErrorException e) {
+            return ResponseEntity.status(e.getStatusCode()).build();
+        }
+        return ResponseEntity.ok(taskStatus);
     }
 }

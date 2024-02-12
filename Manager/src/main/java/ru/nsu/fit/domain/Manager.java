@@ -49,6 +49,9 @@ public class Manager {
 
     public RequestStatus getTaskStatus(UUID requestId) {
         Task task = tasks.get(requestId);
+        if (task == null) {
+            throw new HttpClientErrorException(HttpStatus.NOT_FOUND);
+        }
         return new RequestStatus(task.status(), task.data().toArray(new String[0]));
     }
 }
