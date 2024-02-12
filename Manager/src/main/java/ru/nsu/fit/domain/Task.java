@@ -24,6 +24,11 @@ public class Task {
         return this;
     }
 
+    public Task timeoutExceeded() {
+        status = Status.ERROR;
+        return this;
+    }
+
     public Status status() {
         return status;
     }
