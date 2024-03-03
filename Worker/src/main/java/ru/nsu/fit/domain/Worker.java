@@ -1,6 +1,7 @@
 package ru.nsu.fit.domain;
 
-import org.paukov.combinatorics3.Generator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.reactive.function.client.WebClient;
 import ru.nsu.fit.dto.WorkerResponse;
 import ru.nsu.fit.port.WorkerUrl;
@@ -24,6 +25,7 @@ public class Worker {
             throw new RuntimeException(e);
         }
     }
+    private final Logger logger = LoggerFactory.getLogger(Worker.class);
 
     public Worker() {
         this.symbols = new Character[26 + 10];
@@ -39,6 +41,8 @@ public class Worker {
     public void processManagerTask(UUID requestId, String desiredHash, int maxLength, int partNumber, int partCount) {
         Character[] alphabet = sliceAlphabetArray(partNumber, partCount);
         Set<String> hashEqualWords = findHashEqualWords(desiredHash, maxLength, alphabet);
+        logger.info("Worker #{} is starting processing manager task", partNumber);
+        logger.info("Worker #{} has finished, found words: {}", partNumber, hashEqualWords.stream().reduce((a, b) -> a + b));
         sendWordsToManager(requestId, hashEqualWords);
     }
 

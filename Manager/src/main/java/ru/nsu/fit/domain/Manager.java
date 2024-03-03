@@ -1,5 +1,7 @@
 package ru.nsu.fit.domain;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -21,6 +23,7 @@ public class Manager {
     public final static int WORKERS_NUMBER = 2;
     private final static Duration timeout = Duration.of(60, ChronoUnit.SECONDS);
     private final Map<UUID, Task> tasks = new ConcurrentHashMap<>();
+    private final Logger logger = LoggerFactory.getLogger(Manager.class);
 
     public Manager() {
 
@@ -28,6 +31,7 @@ public class Manager {
 
     public UUID splitTask(String hash, int maxLength) {
         UUID requestId = registerTaskRequest();
+        logger.info("Sending task {} to workers", requestId);
         sendTaskToWorker(requestId, hash, maxLength);
         return requestId;
     }
@@ -57,13 +61,7 @@ public class Manager {
                             .retrieve()
                             .toBodilessEntity()
                             .block(timeout);
-
-                    System.out.println("\n");
-                    System.out.println(finalWorkerIndex);
-                    System.out.println(constructWorkerURL(finalWorkerIndex + 1));
-                    System.out.println("\n");
                 } catch (RuntimeException e) {
-                    System.out.println(e.getMessage());
                     if (e instanceof IllegalStateException) {
                         setErrorStatus(requestId);
                     }
