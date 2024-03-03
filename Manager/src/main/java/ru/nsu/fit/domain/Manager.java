@@ -19,7 +19,7 @@ import java.util.concurrent.Executors;
 @org.springframework.stereotype.Service
 public class Manager {
     public final static int WORKERS_NUMBER = 2;
-    private final static Duration timeout = Duration.of(4, ChronoUnit.SECONDS);
+    private final static Duration timeout = Duration.of(60, ChronoUnit.SECONDS);
     private final Map<UUID, Task> tasks = new ConcurrentHashMap<>();
 
     public Manager() {
