@@ -13,18 +13,17 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @org.springframework.stereotype.Service
 public class Manager {
-    public final static int WORKERS_NUMBER = 1;
-    private final static Duration timeout = Duration.of(60, ChronoUnit.SECONDS);
+    public final static int WORKERS_NUMBER = 2;
+    private final static Duration timeout = Duration.of(4, ChronoUnit.SECONDS);
     private final Map<UUID, Task> tasks = new ConcurrentHashMap<>();
-    private final WebClient webClient;
 
     public Manager() {
-        this.webClient = WebClient.builder()
-                .baseUrl(ManagerUrl.WORKER_CRACK_REQUEST)
-                .build();
+
     }
 
     public UUID splitTask(String hash, int maxLength) {
@@ -45,20 +44,36 @@ public class Manager {
     }
 
     private void sendTaskToWorker(UUID requestId, String hash, int maxLength) {
-        Thread sender = new Thread(() -> {
-            try {
-                webClient.post()
-                        .bodyValue(new WorkerCrackRequest(requestId, hash, maxLength, 1, 1))
-                        .retrieve()
-                        .toBodilessEntity()
-                        .block(timeout);
-            } catch (RuntimeException e) {
-                if (e instanceof IllegalStateException) {
-                    setErrorStatus(requestId);
+        ExecutorService executorService = Executors.newFixedThreadPool(WORKERS_NUMBER);
+        for (int workerIndex = 0; workerIndex < WORKERS_NUMBER; workerIndex++) {
+            int finalWorkerIndex = workerIndex;
+            executorService.submit(() -> {
+                try {
+                    WebClient.builder()
+                            .baseUrl(constructWorkerURL(finalWorkerIndex + 1))
+                            .build()
+                            .post()
+                            .bodyValue(new WorkerCrackRequest(requestId, hash, maxLength, finalWorkerIndex + 1, WORKERS_NUMBER))
+                            .retrieve()
+                            .toBodilessEntity()
+                            .block(timeout);
+
+                    System.out.println("\n");
+                    System.out.println(finalWorkerIndex);
+                    System.out.println(constructWorkerURL(finalWorkerIndex + 1));
+                    System.out.println("\n");
+                } catch (RuntimeException e) {
+                    System.out.println(e.getMessage());
+                    if (e instanceof IllegalStateException) {
+                        setErrorStatus(requestId);
+                    }
                 }
-            }
-        });
-        sender.start();
+            });
+        }
+    }
+
+    private String constructWorkerURL(int workerNumber) {
+        return String.format(ManagerUrl.WORKER_CRACK_REQUEST_TEMPLATE, workerNumber);
     }
 
     public void mergeWords(UUID requestId, Set<String> foundWords) {

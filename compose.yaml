@@ -3,5 +3,7 @@ services:
     build: Manager
     ports:
       - 8080:8080
-  worker:
+  worker1:
+    build: Worker
+  worker2:
     build: Worker
