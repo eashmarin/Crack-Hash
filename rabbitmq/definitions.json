@@ -1,0 +1,93 @@
+{
+  "users": [
+    {
+      "name": "guest",
+      "password_hash": "BMfxN8drrYcIqXZMr+pWTpDT0nMcOagMduLX0bjr4jwud/pN",
+      "hashing_algorithm": "rabbit_password_hashing_sha256",
+      "tags": [
+        "administrator"
+      ],
+      "limits": {}
+    }
+  ],
+  "vhosts": [
+    {
+      "name": "/"
+    }
+  ],
+  "permissions": [
+    {
+      "user": "guest",
+      "vhost": "/",
+      "configure": ".*",
+      "write": ".*",
+      "read": ".*"
+    }
+  ],
+  "queues": [
+    {
+      "name": "managerQueue",
+      "vhost": "/",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {
+        "x-queue-type": "classic"
+      }
+    },
+    {
+      "name": "workerQueue1",
+      "vhost": "/",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {
+        "x-queue-type": "classic"
+      }
+    },
+    {
+      "name": "workerQueue2",
+      "vhost": "/",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {
+        "x-queue-type": "classic"
+      }
+    }
+  ],
+  "exchanges": [
+    {
+      "name": "myexchange",
+      "vhost": "/",
+      "type": "direct",
+      "durable": true,
+      "auto_delete": false,
+      "internal": false,
+      "arguments": {}
+    }
+  ],
+  "bindings": [
+    {
+      "source": "myexchange",
+      "vhost": "/",
+      "destination": "managerQueue",
+      "destination_type": "queue",
+      "routing_key": "manager",
+      "arguments": {}
+    },
+    {
+      "source": "myexchange",
+      "vhost": "/",
+      "destination": "workerQueue1",
+      "destination_type": "queue",
+      "routing_key": "worker1",
+      "arguments": {}
+    },
+    {
+      "source": "myexchange",
+      "vhost": "/",
+      "destination": "workerQueue2",
+      "destination_type": "queue",
+      "routing_key": "worker2",
+      "arguments": {}
+    }
+  ]
+}
