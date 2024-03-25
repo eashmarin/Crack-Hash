@@ -3,6 +3,7 @@ package ru.nsu.fit.core.impl.domain;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.Predicate;
 
 public class Task {
     private Status status = Status.IN_PROGRESS;
@@ -15,10 +16,10 @@ public class Task {
         return new Task();
     }
 
-    public Task workerCompleted(Set<String> foundWords, final int WORKERS_NUMBER) {
+    public Task workerCompleted(Set<String> foundWords, Predicate<Integer> taskDone) {
         data.addAll(foundWords);
         completedWorkers++;
-        if (completedWorkers == WORKERS_NUMBER) {
+        if (taskDone.test(completedWorkers)) {
             status = Status.READY;
         }
         return this;

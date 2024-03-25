@@ -24,9 +24,7 @@ public class QueueBeansDefinitionRegister implements BeanDefinitionRegistryPostP
     @Override
     public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) throws BeansException {
         registerQueue(properties.getQueues().manager());
-        properties.getQueues()
-                .workers()
-                .forEach(this::registerQueue);
+        registerQueue(properties.getQueues().worker());
     }
 
     private void registerQueue(QueueInfo queue) {

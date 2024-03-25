@@ -22,7 +22,7 @@ public class Worker {
     }
 
     public void processManagerTask(UUID requestId, String desiredHash, int maxLength, int partNumber, int partCount) {
-        logger.info("Worker #{} is starting processing manager task", partNumber);
+        logger.info("Worker #{} is starting processing manager task {}", partNumber, requestId);
         Set<String> hashEqualWords = hashCracker.findHashEqualWords(desiredHash, maxLength, partNumber, partCount);
         logger.info("Worker #{} has finished, found words: {}", partNumber, hashEqualWords.stream().reduce((a, b) -> a + b));
         sendWordsToManager(requestId, hashEqualWords);

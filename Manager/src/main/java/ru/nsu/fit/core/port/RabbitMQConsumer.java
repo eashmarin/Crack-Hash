@@ -1,23 +1,32 @@
 package ru.nsu.fit.core.port;
 
+import com.rabbitmq.client.Channel;
 import org.springframework.amqp.rabbit.annotation.EnableRabbit;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.amqp.support.AmqpHeaders;
+import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.stereotype.Component;
 import ru.nsu.fit.core.api.dto.WorkerResponse;
-import ru.nsu.fit.core.impl.domain.Manager;
+import ru.nsu.fit.core.impl.service.ManagerService;
+
+import java.io.IOException;
 
 @Component
 @EnableRabbit
 public class RabbitMQConsumer {
 
-    private final Manager manager;
+    private final ManagerService managerService;
 
-    public RabbitMQConsumer(Manager manager) {
-        this.manager = manager;
+    public RabbitMQConsumer(ManagerService managerService) {
+        this.managerService = managerService;
     }
 
+
     @RabbitListener(queues = "${spring.rabbitmq.own-queue}")
-    public void processWorkerResponse(WorkerResponse response) {
-        manager.mergeWords(response.requestId(), response.data());
+    public void processWorkerResponse(WorkerResponse response,
+                                      Channel channel,
+                                      @Header(AmqpHeaders.DELIVERY_TAG) long tag) throws IOException {
+        managerService.processWorkerResponse(response);
+        channel.basicAck(tag, false);
     }
 }

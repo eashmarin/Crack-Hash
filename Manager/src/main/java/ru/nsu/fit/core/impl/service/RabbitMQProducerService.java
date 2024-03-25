@@ -20,9 +20,7 @@ public class RabbitMQProducerService implements ProducerService {
 
     @Override
     public void sendCrackRequestToWorker(WorkerCrackRequest crackRequest, Integer workerNumber) {
-        QueueInfo workerQueue = rabbitConfig.getQueues()
-                .workers()
-                .get(workerNumber - 1);
+        QueueInfo workerQueue = rabbitConfig.getQueues().worker();
         rabbitTemplate.convertAndSend(workerQueue.exchange(), workerQueue.routingKey(), crackRequest);
         System.out.println("Sending message: $^_^$ " + crackRequest.requestId());
     }

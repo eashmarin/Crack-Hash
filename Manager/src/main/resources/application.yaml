@@ -4,16 +4,23 @@ spring:
     username: guest
     password: guest
     virtual-host: /
+    listener:
+      simple:
+        acknowledge-mode: manual
     queues:
       manager:
         name: managerQueue
         routing-key: manager
         exchange: myexchange
-      workers:
-        - name: workerQueue1
-          routing-key: worker1
-          exchange: myexchange
-        - name: workerQueue2
-          routing-key: worker2
-          exchange: myexchange
+      worker:
+        name: workerQueue
+        routing-key: worker
+        exchange: myexchange
     own-queue: ${QUEUE}
+  data:
+    mongodb:
+      host: mongodb
+      port: 27017
+      database: crackhash
+crackhash:
+  workers-number: ${WORKERS_NUMBER}
