@@ -12,7 +12,7 @@ import ru.nsu.fit.core.impl.domain.Worker;
 import java.io.IOException;
 
 @Component
-@EnableRabbit
+
 public class RabbitMQConsumer {
 
     private final Worker worker;
@@ -21,7 +21,7 @@ public class RabbitMQConsumer {
         this.worker = worker;
     }
 
-    @RabbitListener(queues = "${spring.rabbitmq.own-queue}")
+    @RabbitListener(queues = "${spring.broker.own-queue}", containerFactory = "myRabbitListenerContainerFactory")
     public void processManagerTask(WorkerCrackRequest request,
                                    Channel channel,
                                    @Header(AmqpHeaders.DELIVERY_TAG) long tag) throws IOException {

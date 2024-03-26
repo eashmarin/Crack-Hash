@@ -1,5 +1,8 @@
+logging:
+  level:
+    root: INFO
 spring:
-  rabbitmq:
+  broker:
     host: rabbitmq
     username: guest
     password: guest
@@ -7,6 +10,8 @@ spring:
     listener:
       simple:
         acknowledge-mode: manual
+    publisher-confirm-type: correlated
+    publisher-returns: true
     queues:
       manager:
         name: managerQueue
@@ -19,8 +24,6 @@ spring:
     own-queue: ${QUEUE}
   data:
     mongodb:
-      host: mongodb
-      port: 27017
-      database: crackhash
+      uri: mongodb://crackhash_user:crackhash@mongo1:27017,mongo2:27017,mongo3:27017/crackhash
 crackhash:
   workers-number: ${WORKERS_NUMBER}

@@ -1,5 +1,8 @@
+logging:
+  level:
+    root: INFO
 spring:
-  rabbitmq:
+  broker:
     host: rabbitmq
     username: guest
     password: guest
@@ -7,6 +10,8 @@ spring:
     listener:
       simple:
         acknowledge-mode: manual
+    publisher-confirm-type: correlated
+    publisher-returns: true
     queues:
       manager:
         name: managerQueue

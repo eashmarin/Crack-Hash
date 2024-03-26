@@ -12,7 +12,6 @@ import ru.nsu.fit.core.impl.service.ManagerService;
 import java.io.IOException;
 
 @Component
-@EnableRabbit
 public class RabbitMQConsumer {
 
     private final ManagerService managerService;
@@ -22,7 +21,7 @@ public class RabbitMQConsumer {
     }
 
 
-    @RabbitListener(queues = "${spring.rabbitmq.own-queue}")
+    @RabbitListener(queues = "${spring.broker.own-queue}", containerFactory = "myRabbitListenerContainerFactory")
     public void processWorkerResponse(WorkerResponse response,
                                       Channel channel,
                                       @Header(AmqpHeaders.DELIVERY_TAG) long tag) throws IOException {

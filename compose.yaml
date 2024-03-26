@@ -8,18 +8,18 @@ services:
       SPRING_AMQP_DESERIALIZATION_TRUST_ALL: true
       WORKERS_NUMBER: 1
     depends_on:
-      - mongodb
+      - mongosetup
       - rabbitmq
   worker1:
     build: Worker
     environment:
       QUEUE: workerQueue
       SPRING_AMQP_DESERIALIZATION_TRUST_ALL: true
-  worker2:
-    build: Worker
-    environment:
-      QUEUE: workerQueue
-      SPRING_AMQP_DESERIALIZATION_TRUST_ALL: true
+#  worker2:
+#    build: Worker
+#    environment:
+#      QUEUE: workerQueue
+#      SPRING_AMQP_DESERIALIZATION_TRUST_ALL: true
   rabbitmq:
     image: rabbitmq:3.13.0-management-alpine
     hostname: rabbitmq
@@ -31,9 +31,37 @@ services:
       - ./rabbitmq/definitions.json:/etc/rabbitmq/definitions.json:ro
     ports:
       - 15672:15672
-  mongodb:
+  mongo1:
     image: mongo:latest
     environment:
       - MONGO_INITDB_DATABASE=crackhash
     volumes:
       - ./mongodb/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+      - ./mongodb/data/db1:/data/db
+    entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "crackhash-mongo-set", "--quiet", "--logpath", "/dev/null" ]
+  mongo2:
+    image: mongo:latest
+    environment:
+      - MONGO_INITDB_DATABASE=crackhash
+    volumes:
+      - ./mongodb/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+      - ./mongodb/data/db2:/data/db
+    entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "crackhash-mongo-set", "--quiet", "--logpath", "/dev/null" ]
+  mongo3:
+    image: mongo:latest
+    environment:
+      - MONGO_INITDB_DATABASE=crackhash
+    volumes:
+      - ./mongodb/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+      - ./mongodb/data/db3:/data/db
+    entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "crackhash-mongo-set", "--quiet", "--logpath", "/dev/null" ]
+  mongosetup:
+    image: mongo:latest
+    depends_on:
+      - mongo1
+      - mongo2
+      - mongo3
+    restart: "no"
+    volumes:
+      - ./mongodb/rs-init.sh:/scripts/rs-init.sh
+    entrypoint: [ "bash", "-c", "sleep 10 && /scripts/rs-init.sh" ]
